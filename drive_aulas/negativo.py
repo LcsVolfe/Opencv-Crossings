@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-img = cv.imread('len_top.jpg', 0)
+img = cv.imread('bioterio.png', 0)
 cv.namedWindow('imagem1')
 cv.imshow("imagem1", img)
 cv.namedWindow('imagem')

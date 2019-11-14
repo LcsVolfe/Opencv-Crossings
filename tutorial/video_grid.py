@@ -9,11 +9,11 @@ while(True):
     # Our operations on the frame come here
     fr = cv2.resize(frame, (600,600))
 
-    gray = cv2.cvtColor(fr, cv2.COLOR_BGR2GRAY)
-    kernel = np.ones((5,5), np.uint8) 
+    # gray = cv2.cvtColor(fr, cv2.COLOR_BGR2GRAY)
+    # kernel = np.ones((5,5), np.uint8) 
 
-    gradient = cv2.morphologyEx(gray, cv2.MORPH_GRADIENT, kernel)    
-    canny = cv2.Canny(gradient, 175, 65)
+    # gradient = cv2.morphologyEx(gray, cv2.MORPH_GRADIENT, kernel)    
+    # canny = cv2.Canny(gradient, 175, 65)
     #cv2.imshow('tratamento',gradient)
     
     
@@ -23,16 +23,17 @@ while(True):
     # file_path = 'bioterio.png'
     # img = cv2.imread(file_path)
 
-    # gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    # edges = cv2.Canny(gray,90,150,apertureSize = 3)
-    # kernel = np.ones((3,3),np.uint8)
-    # edges = cv2.dilate(edges,kernel,iterations = 1)
-    # kernel = np.ones((5,5),np.uint8)
-    # edges = cv2.erode(edges,kernel,iterations = 1)
+    gray = cv2.cvtColor(fr,cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray,255,255,apertureSize = 3)
+    kernel = np.ones((3,3),np.uint8)
+    edges = cv2.dilate(edges,kernel,iterations = 1)
+    kernel = np.ones((5,5),np.uint8)
+    edges = cv2.erode(edges,kernel,iterations = 1)
 
-    cv2.imwrite('edge.png',canny)
+    # cv2.imwrite('edge.png',edges)
+    cv2.imshow('MultiTracker', edges)
 
-    lines = cv2.HoughLines(canny,1,np.pi/1,1)
+    lines = cv2.HoughLines(edges,1,np.pi/18,15)
 
     if not lines.any():
         print('No lines were found')

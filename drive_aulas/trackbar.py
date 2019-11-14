@@ -6,7 +6,7 @@ y1=0
 width=0
 heigth=0
 ini = fim = 0
-img = cv.imread('Quimeras.jpg')
+img = cv.imread('bioterio.png')
 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 def nothing(x):
     global img, fim, ini

@@ -17,7 +17,7 @@ def segundo(x):
     cv2.imshow("Canny", img2)
 
 
-img = cv2.imread('open_field.png',0)
+img = cv2.imread('bioterio.png',0)
 cv2.namedWindow('img')
 cv2.imshow('img', img)
 
