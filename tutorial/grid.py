@@ -5,7 +5,7 @@ import numpy as np
 filter = False
 
 
-file_path = 'bioterio.png'
+file_path = 'grids_red.png'
 img = cv2.imread(file_path)
 
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
