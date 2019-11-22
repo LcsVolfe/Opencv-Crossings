@@ -1,9 +1,15 @@
 import cv2
 import numpy as np
-font = cv2.FONT_HERSHEY_COMPLEX
+# font = cv2.FONT_HERSHEY_COMPLEX
 
 img = cv2.imread("grids_red.png", cv2.IMREAD_GRAYSCALE)
-threshold = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY)
+blurred = cv2.GaussianBlur(img, (9, 9), 0)
+thresh = cv2.adaptiveThreshold(blurred, 255, 1, 1, 11, 2)
+
+mask = cv2.erode(blurred, None, iterations=2)
+mask = cv2.dilate(mask, None, iterations=2)
+
+threshold = cv2.threshold(blurred, 240, 255, cv2.THRESH_BINARY)
 
 # contours = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -23,7 +29,7 @@ threshold = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY)
 #     else:
 #         cv2.putText(img, "Circle", (x, y), font, 1, (0))
         
-cv2.imshow("shapes", img)
-cv2.imshow("Threshold", threshold)
+cv2.imshow("shapes", thresh)
+# cv2.imshow("Threshold ", img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
