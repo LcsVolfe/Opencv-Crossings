@@ -1,39 +1,26 @@
-import cv2
 import numpy as np
+import cv2
 
-cap = cv2.VideoCapture('form_crop.mp4')
+image = cv2.imread('grids_red.png')
+original = image.copy()
+image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+lower = np.array([0, 0, 0], dtype="uint8")
+upper = np.array([50, 50, 50], dtype="uint8")
+mask = cv2.inRange(image, lower, upper)
 
-while True:
-    _, frame = cap.read()
-    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        # Red color
-    low_red = np.array([161, 155, 84])
-    high_red = np.array([179, 255, 255])
-    red_mask = cv2.inRange(hsv_frame, low_red, high_red)
-    red = cv2.bitwise_and(frame, frame, mask=red_mask)
-    # Blue color
-    low_blue = np.array([94, 80, 2])
-    high_blue = np.array([126, 255, 255])
-    blue_mask = cv2.inRange(hsv_frame, low_blue, high_blue)
-    blue = cv2.bitwise_and(frame, frame, mask=blue_mask)
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+opening = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
 
-    # Green color
-    low_green = np.array([25, 52, 72])
-    high_green = np.array([102, 255, 255])
-    green_mask = cv2.inRange(hsv_frame, low_green, high_green)
-    green = cv2.bitwise_and(frame, frame, mask=green_mask)
+cnts = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+cnts = cnts[0] if len(cnts) == 2 else cnts[1]
 
-    # Every color except white
-    low = np.array([0, 42, 0])
-    high = np.array([179, 255, 255])
-    mask = cv2.inRange(hsv_frame, low, high)
-    result = cv2.bitwise_and(frame, frame, mask=mask)
-    cv2.imshow("Frame", frame)
-    cv2.imshow("Red", red)
-    cv2.imshow("Blue", blue)
-    cv2.imshow("Green", green)
-    cv2.imshow("Result", result)
+area = 0
+for c in cnts:
+    area += cv2.contourArea(c)
+    cv2.drawContours(original,[c], 0, (0,0,0), 2)
 
-    key = cv2.waitKey(1)
-    if key == 27:
-        break
+print(area)
+cv2.imshow('mask', mask)
+cv2.imshow('original', original)
+cv2.imshow('opening', opening)
+cv2.waitKey()

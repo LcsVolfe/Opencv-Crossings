@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
+import imutils
 
-cap = cv2.VideoCapture('bio_cut.mp4')
+cap = cv2.VideoCapture('form_crop.mp4')
 
 while(True):
     # Capture frame-by-frame
@@ -23,17 +24,40 @@ while(True):
     # file_path = 'bioterio.png'
     # img = cv2.imread(file_path)
 
-    gray = cv2.cvtColor(fr,cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray,255,255,apertureSize = 3)
-    kernel = np.ones((3,3),np.uint8)
-    edges = cv2.dilate(edges,kernel,iterations = 1)
-    kernel = np.ones((5,5),np.uint8)
-    edges = cv2.erode(edges,kernel,iterations = 1)
+    # gray = cv2.cvtColor(fr,cv2.COLOR_BGR2GRAY)
+    # edges = cv2.Canny(gray,255,255,apertureSize = 3)
+    # kernel = np.ones((3,3),np.uint8)
+    # edges = cv2.dilate(edges,kernel,iterations = 1)
+    # kernel = np.ones((5,5),np.uint8)
+    # edges = cv2.erode(edges,kernel,iterations = 1)
 
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+    thresh = cv2.threshold(blurred, 30, 255, cv2.THRESH_BINARY)[1]
     # cv2.imwrite('edge.png',edges)
-    cv2.imshow('MultiTracker', edges)
+    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = imutils.grab_contours(cnts)
 
-    lines = cv2.HoughLines(edges,1,np.pi/18,15)
+
+    # loop over the contours
+    for c in cnts:
+        # compute the center of the contour
+        M = cv2.moments(c)
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+    
+        # draw the contour and center of the shape on the image
+        cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
+        cv2.circle(thresh, (cX, cY), 7, (255, 255, 255), -1)
+        cv2.putText(frame, "center", (cX - 20, cY - 20),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    
+        # show the image
+        cv2.imshow("Image", frame)
+    # cv2.imshow('MultiTracker', thresh)
+
+    lines = cv2.HoughLines(thresh,1,np.pi/18,15)
 
     if not lines.any():
         print('No lines were found')

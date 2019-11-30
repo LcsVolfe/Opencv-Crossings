@@ -1,17 +1,19 @@
 import argparse
 import imutils
 import cv2
- 
+
+
 
 image = cv2.imread('grids_red.png')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (3, 3), 0)
-thresh = cv2.threshold(blurred, 30, 255, cv2.THRESH_BINARY)[1]
+thresh = cv2.threshold(blurred, 30, 255, cv2.THRESH_BINARY_INV)[1]
 
 # find contours in the thresholded image
-cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-	cv2.CHAIN_APPROX_SIMPLE)
+cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 cnts = imutils.grab_contours(cnts)
+
+cv2.imshow("ss", thresh)
 
 # loop over the contours
 for c in cnts:
@@ -27,5 +29,5 @@ for c in cnts:
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
  
 	# show the image
-	cv2.imshow("Image", thresh)
+	cv2.imshow("Image", image)
 	cv2.waitKey(0)

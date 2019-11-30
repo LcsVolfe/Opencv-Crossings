@@ -2,18 +2,21 @@ import cv2
 import sys
 import numpy as np
  
-camera = cv2.imread('grid_red.png', cv2.IMREAD_GRAYSCALE)
-# Setup BlobDetector
-params = cv2.SimpleBlobDetector_Params()	 	 
-# Create a detector with the parameters
-detector = cv2.SimpleBlobDetector_create(params)
-keypoints = detector.detect(camera)
+image = cv2.imread('grid_red.png')
 
-# Uncomment to resize to fit output window if needed
-#im = cv2.resize(im, None,fx=0.5, fy=0.5, interpolation = cv2.INTER_CUBIC)
-cv2.imshow("Output", camera)
-
-k = cv2.waitKey(1) & 0xff
-
-camera.release()
-cv2.destroyAllWindows()
+# Read image
+im = cv2.imread("grid_red.png", cv2.IMREAD_GRAYSCALE)
+ 
+# Set up the detector with default parameters.
+detector = cv2.SimpleBlobDetector()
+ 
+# Detect blobs.
+# keypoints = detector.detect(im)
+ 
+# Draw detected blobs as red circles.
+# cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
+im_with_keypoints = cv2.drawKeypoints(im, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+ 
+# Show keypoints
+cv2.imshow("Keypoints", im_with_keypoints)
+cv2.waitKey(0)
