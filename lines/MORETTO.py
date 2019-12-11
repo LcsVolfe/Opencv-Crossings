@@ -5,6 +5,8 @@ import time
 
 cap = cv2.VideoCapture('v.mp4')
 
+
+
 contador = 0
 ultimoGridVisitadoX = None
 ultimoGridVisitadoY = None

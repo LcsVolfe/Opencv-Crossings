@@ -3,14 +3,12 @@ import cv2
 import imutils
 import time
 
-cap = cv2.VideoCapture('v.mp4')
+cap = cv2.VideoCapture('v2.mp4')
 
 contador = 0
 ultimoGridVisitadoX = None
 ultimoGridVisitadoY = None
 #safe_view = 0
-contador_frame = 0
-grid_detection = True
 
 def conferirIndicesArray(arr, novoValor):    
     if (arr[-1]+100) < novoValor:
@@ -59,13 +57,7 @@ def determinarGrids(frame, width, height):
     
 
 while(cap.isOpened()):
-    
-    # CONTADOR PARA FUNÇÃO DE DETECT
-    contador_frame = contador_frame+1
-    if contador_frame == 10:
-        grid_detection = True
-        contador_frame = 0
-    
+        
     ret, frame = cap.read()
     height, width, aux = frame.shape
     frame_drawable = frame  
@@ -76,13 +68,11 @@ while(cap.isOpened()):
     high_red = np.array([180,255,255])
     red_mask = cv2.inRange(hsv_frame, low_red, high_red)
     red = cv2.bitwise_and(frame, frame, mask=red_mask)
-    gray = cv2.cvtColor(red, cv2.COLOR_RGB2GRAY)
-    gray_thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)[1]
+        
+    x_up, x_down, y_up, y_down = determinarGrids(red_mask,width, height)
     
-    x_up, x_down, y_up, y_down = determinarGrids(gray_thresh,width, height)
-    
-    if grid_detection and len(x_up) > 1 and len(x_down) > 1 and len(y_up) > 1 and len(y_down) > 1:
-        grid_detection=False
+    if len(x_up) > 1 and len(x_down) > 1 and len(y_up) > 1 and len(y_down) > 1:
+        
         cv2.line(frame_drawable, (x_up[0], 0), (x_down[0], height-1), (255, 100, 0), 3)
         cv2.line(frame_drawable, (x_up[1], 0), (x_down[1], height-1), (255, 100, 0), 3)
         cv2.line(frame_drawable, (0, y_up[0]), (width-1, y_down[0]), (255, 100, 0), 3)
@@ -103,13 +93,11 @@ while(cap.isOpened()):
         for c in cnts:
             # ENCONTRA O CENTRO DA IMAGEM
             M = cv2.moments(c)
-            
             if M["m00"] != 0:
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
             else:
                 cX, cY = 0, 0    
-            
             
             # DESENHA ENCIMA DO CENTER_ID
             cv2.drawContours(frame_drawable, [c], -1, (0, 255, 0), 2)
@@ -117,11 +105,7 @@ while(cap.isOpened()):
             cv2.putText(frame_drawable, "center", (cX - 20, cY - 20),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         
-            if gray_thresh[cY, cX] == 0:
-                # print(ultimoGridVisitado, ' ultimoGridVisitado ')
-                # print(cY > y_up[1], cY > y_down[1], cY , y_up[1], y_down[1], ' \n')
-                # print(grids_visitados)           
-                    
+            if red_mask[cY, cX] == 0:
                 
                 media_cX_0 = (x_up[0] + x_down[0])/2
                 media_cX_1 = (x_up[1] + x_down[1])/2
@@ -132,38 +116,44 @@ while(cap.isOpened()):
                 # #### EIXOS VERTICAIS
                 if cX != 0:
                     if (cX-15) > media_cX_1 and ultimoGridVisitadoX != 3:
+                        if ultimoGridVisitadoX != None:
+                            contador = contador+1
                         ultimoGridVisitadoX=3                      
-                        contador = contador+1
                     # # 2 linha
                     
                     elif (((cX-15) > media_cX_0) and ((cX+15) < media_cX_1)) and ultimoGridVisitadoX != 2:
+                        if ultimoGridVisitadoX != None:
+                            contador = contador+1
                         ultimoGridVisitadoX=2
-                        contador = contador+1
                         
                     # # 1 linha
                     elif (cX+15) < media_cX_0 and ultimoGridVisitadoX != 1:
+                        if ultimoGridVisitadoX != None:
+                            contador = contador+1
                         ultimoGridVisitadoX=1
-                        contador = contador+1
                     
                 #### EIXOS HORIZONTAIS
                 if cY != 0:
                     if (cY-15) > media_cY_1 and ultimoGridVisitadoY != 3:
+                        if ultimoGridVisitadoY != None:
+                            contador = contador+1
                         ultimoGridVisitadoY=3                       
-                        contador = contador+1
                         
                     # 2 linha
                     elif (((cY-15) > media_cY_0) and ((cY+15) < media_cY_1)) and ultimoGridVisitadoY != 2:
+                        if ultimoGridVisitadoY != None:
+                            contador = contador+1
                         ultimoGridVisitadoY=2
-                        contador = contador+1
                         
                     # # 1 linha
                     elif (cY-15) < media_cY_0 and ultimoGridVisitadoY != 1:
+                        if ultimoGridVisitadoY != None:
+                            contador = contador+1
                         ultimoGridVisitadoY=1
-                        contador = contador+1
                 
                     
                 
-                # time.sleep(1)
+                time.sleep(0.2)
             
             cv2.putText(frame_drawable, ("Contador: " + str(contador)), (50, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)   
